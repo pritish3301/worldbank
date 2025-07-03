@@ -42,7 +42,8 @@ def encode_categoricals(data):
 
 # ---------------- Helper functions -----------------------------------------
 def plot_conf_mat(cm, classes):
-    fig, ax = plt.subplots(figsize=(6, 5))   # ← identical to heat-map
+    # ► set identical size ◄
+    fig, ax = plt.subplots(figsize=(6, 5))       # 6 inches wide × 5 inches tall
     im = ax.imshow(cm, interpolation="nearest", cmap="viridis")
     ax.set_xticks(np.arange(len(classes))); ax.set_yticks(np.arange(len(classes)))
     ax.set_xticklabels(classes); ax.set_yticklabels(classes)
@@ -54,7 +55,8 @@ def plot_conf_mat(cm, classes):
     st.pyplot(fig)
 
 def roc_curve_multi(fpr_tpr_dict):
-    fig, ax = plt.subplots(figsize=(6, 5))   # ← identical to heat-map
+    # ► set identical size ◄
+    fig, ax = plt.subplots(figsize=(6, 5))       # 6 inches wide × 5 inches tall
     for name, (fpr, tpr) in fpr_tpr_dict.items():
         ax.plot(fpr, tpr, label=f"{name} (AUC={auc(fpr,tpr):.2f})")
     ax.plot([0, 1], [0, 1], "--", lw=1)
@@ -62,6 +64,7 @@ def roc_curve_multi(fpr_tpr_dict):
     ax.set_title("ROC Curve")
     ax.legend()
     st.pyplot(fig)
+
 
 
 # ---------------- Main Tabs -------------------------------------------------
