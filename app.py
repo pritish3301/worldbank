@@ -72,36 +72,38 @@ def dummies(data: pd.DataFrame) -> pd.DataFrame:
     """One-hot encoding w/ first level dropped."""
     return pd.get_dummies(data, drop_first=True)
 
-
 # ------------------------------------------------------------------
-#  Helper functions – compact plots
+#  Compact-sized plots that never auto-stretch
 # ------------------------------------------------------------------
-def pretty_cm(cm: np.ndarray, labels: list[str]) -> None:
-    """Small 4×3-inch confusion matrix (fits one screen)."""
-    fig, ax = plt.subplots(figsize=(4, 3))
+def pretty_cm(cm, labels):
+    """Confusion matrix ≈ 300 px wide."""
+    fig, ax = plt.subplots(figsize=(3, 2))          # really small
     im = ax.imshow(cm, cmap="viridis")
     ax.set_xticks(np.arange(len(labels)))
     ax.set_yticks(np.arange(len(labels)))
-    ax.set_xticklabels(labels), ax.set_yticklabels(labels)
+    ax.set_xticklabels(labels, fontsize=6)
+    ax.set_yticklabels(labels, fontsize=6)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
-            ax.text(j, i, cm[i, j], ha="center", va="center", color="white")
-    ax.set_xlabel("Predicted"), ax.set_ylabel("Actual")
-    plt.tight_layout(pad=0.3)
-    st.pyplot(fig)                       # ← no container-wide stretch
+            ax.text(j, i, cm[i, j], ha="center", va="center", color="white", fontsize=6)
+    ax.set_xlabel("Predicted", fontsize=8)
+    ax.set_ylabel("Actual", fontsize=8)
+    plt.tight_layout(pad=0.2)
+    st.pyplot(fig, use_container_width=False)       # ← prevent auto-stretch
 
 
-def multi_roc(curves: dict[str, tuple[np.ndarray, np.ndarray]]) -> None:
-    """Compact 5×3-inch multi-ROC plot."""
-    fig, ax = plt.subplots(figsize=(5, 3))
+def multi_roc(curves):
+    """Multi-ROC ≈ 400 px wide."""
+    fig, ax = plt.subplots(figsize=(4, 2.5))        # really small
     for name, (fpr, tpr) in curves.items():
         ax.plot(fpr, tpr, label=f"{name} (AUC {auc(fpr, tpr):.2f})")
-    ax.plot([0, 1], [0, 1], "--", lw=1, color="#777")
-    ax.set_xlabel("False Positive Rate"), ax.set_ylabel("True Positive Rate")
-    ax.legend(frameon=False, fontsize="small")
-    plt.tight_layout(pad=0.3)
-    st.pyplot(fig)                       # ← no container-wide stretch
+    ax.plot([0, 1], [0, 1], "--", lw=1, color="#888")
+    ax.set_xlabel("FPR", fontsize=8)
+    ax.set_ylabel("TPR", fontsize=8)
+    ax.legend(frameon=False, fontsize=6)
+    plt.tight_layout(pad=0.2)
+    st.pyplot(fig, use_container_width=False)       # ← prevent auto-stretch
 
 
 
