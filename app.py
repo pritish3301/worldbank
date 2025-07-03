@@ -183,13 +183,21 @@ with tabs[0]:
 # ============================================================================
 with tabs[1]:
     st.header("Purchase-Intent Models")
-  # Confusion matrix dropdown
-algo_cm = st.selectbox("Confusion Matrix for:", list(models.keys()))
-if algo_cm:
+# ── compact, side-by-side CM + ROC ───────────────────────────────
+cm_col, roc_col = st.columns([1, 1])   # two narrow columns
+
+with cm_col:
+    st.markdown("##### Confusion Matrix")
+    algo_cm = st.selectbox("Model:", list(models.keys()), key="cm_algo")
     mdl = models[algo_cm]
-    preds_cm = ...
-    pretty_cm(...)
-    st.caption(...)
+    preds_cm = mdl.predict(scaled_test if algo_cm == "KNN" else X_test)
+    pretty_cm(confusion_matrix(y_test, preds_cm), ["No", "Maybe", "Yes"])
+
+with roc_col:
+    st.markdown("##### ROC Curve")
+    multi_roc(roc_dict)
+# ────────────────────────────────────────────────────────────────
+
 
 st.subheader("ROC Curve")
 multi_roc(roc_dict)
