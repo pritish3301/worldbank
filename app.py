@@ -257,7 +257,10 @@ with tabs[4]:
         preds = mdl.predict(X_test_r)
         reg_results[name] = {
             "R2": r2_score(y_test_r, preds),
-            "RMSE": mean_squared_error(y_test_r, preds, squared=False)
+            import numpy as np  # already imported at top
+mse = mean_squared_error(y_test_r, preds)
+"RMSE": np.sqrt(mse)
+
         }
     st.dataframe(pd.DataFrame(reg_results).T.style.format("{:.2f}"))
     st.caption("Quick comparison of baseline regressors for spend estimation.")
