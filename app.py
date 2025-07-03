@@ -68,12 +68,6 @@ def roc_curve_multi(fpr_tpr_dict):
 tabs = st.tabs(["📊 Data Visualisation", "🤖 Classification",
                 "📍 Clustering", "🔗 Association Rules", "📈 Regression"])
 
-# ---------------------------------------------------------------------------
-# 1. Data Visualisation
-# ---------------------------------------------------------------------------
-with tabs[0]:
-    st.header("Descriptive Insights")
-
  # ---------------------------------------------------------------------------
 # 1. Data Visualisation
 # ---------------------------------------------------------------------------
