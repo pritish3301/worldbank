@@ -257,7 +257,7 @@ with tabs[4]:
         preds = mdl.predict(X_test_r)
         reg_results[name] = {
             "R2": r2_score(y_test_r, preds),
-            import numpy as np  # already imported at top
+            
 mse = mean_squared_error(y_test_r, preds)
 "RMSE": np.sqrt(mse)
 
