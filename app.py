@@ -107,41 +107,43 @@ with c2:
 # ──────────────────────────────────────────────────────────────────────
 
 
-    # ── SECOND ROW ────────────────────────────────────────────────────────
-    left2, right2 = st.columns([3, 1])      # 3:1 width ratio
+  # ── SECOND ROW ────────────────────────────────────────────────────────
+left2, right2 = st.columns([1, 3])      # 1:3 ratio (KPI narrow, chart wide)
 
-    # 2-A Willingness vs Environmental Concern (left)
-    with left2:
-        st.markdown("#### Willingness by Environmental Concern")
-        fig, ax = plt.subplots(figsize=(6, 4))   # laptop-friendly size
-        box_data = [
-            df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
-            for k in sorted(df["env_concern_score"].unique())
-        ]
-        ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
-        ax.set_xlabel("Environmental concern score")
-        ax.set_ylabel("Max willingness to pay (USD)")
-        st.pyplot(fig)
-        st.caption(
-            "Households with stronger green concern are willing to pay more "
-            "for eco-friendly appliances."
-        )
+# (A) KPIs – now on the LEFT
+with left2:
+    st.markdown("### Additional Quick Facts")
+    st.metric(
+        label="Average Monthly Bill (USD)",
+        value=f"{df['monthly_energy_bill_usd'].mean():.1f}"
+    )
+    st.metric(
+        label="Median Max WTP (USD)",
+        value=f"{df['max_willingness_to_pay_usd'].median():.0f}"
+    )
+    st.metric(
+        label="Purchase Intent ≥ 'MAYBE'",
+        value=f"{(df['willing_to_purchase_12m'] > 0).mean() * 100:.1f}%"
+    )
 
-    # 2-B Additional Quick Facts (right)
-    with right2:
-        st.markdown("### Additional Quick Facts")
-        st.metric(
-            label="Average Monthly Bill (USD)",
-            value=f"{df['monthly_energy_bill_usd'].mean():.1f}"
-        )
-        st.metric(
-            label="Median Max WTP (USD)",
-            value=f"{df['max_willingness_to_pay_usd'].median():.0f}"
-        )
-        st.metric(
-            label="Purchase Intent ≥ 'MAYBE'",
-            value=f"{(df['willing_to_purchase_12m'] > 0).mean() * 100:.1f}%"
-        )
+# (B) Box-plot – now on the RIGHT
+with right2:
+    st.markdown("#### Willingness by Environmental Concern")
+    fig, ax = plt.subplots(figsize=(6, 4))   # laptop-friendly size
+    box_data = [
+        df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
+        for k in sorted(df["env_concern_score"].unique())
+    ]
+    ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
+    ax.set_xlabel("Environmental concern score")
+    ax.set_ylabel("Max willingness to pay (USD)")
+    st.pyplot(fig)
+    st.caption(
+        "Households with stronger green concern are willing to pay more "
+        "for eco-friendly appliances."
+    )
+# ─────────────────────────────────────────────────────────────────────
+
 
 
 
