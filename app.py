@@ -41,7 +41,7 @@ def encode_categoricals(data):
     return pd.get_dummies(data, drop_first=True)
 
 def plot_conf_mat(cm, classes):
-    fig, ax = plt.subplots(figsize=(6, 5))          # matches heat-map size
+    fig, ax = plt.subplots(figsize=(6, 5))   # ← identical to heat-map
     im = ax.imshow(cm, interpolation="nearest", cmap="viridis")
     ax.set_xticks(np.arange(len(classes))); ax.set_yticks(np.arange(len(classes)))
     ax.set_xticklabels(classes); ax.set_yticklabels(classes)
@@ -53,7 +53,7 @@ def plot_conf_mat(cm, classes):
     st.pyplot(fig)
 
 def roc_curve_multi(fpr_tpr_dict):
-    fig, ax = plt.subplots(figsize=(6, 5))          # same footprint
+    fig, ax = plt.subplots(figsize=(6, 5))   # ← identical to heat-map
     for name, (fpr, tpr) in fpr_tpr_dict.items():
         ax.plot(fpr, tpr, label=f"{name} (AUC={auc(fpr,tpr):.2f})")
     ax.plot([0, 1], [0, 1], "--", lw=1)
