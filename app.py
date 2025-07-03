@@ -73,29 +73,36 @@ def dummies(data: pd.DataFrame) -> pd.DataFrame:
     return pd.get_dummies(data, drop_first=True)
 
 
+# ------------------------------------------------------------------
+#  Helper functions – compact plots
+# ------------------------------------------------------------------
 def pretty_cm(cm: np.ndarray, labels: list[str]) -> None:
-    fig, ax = plt.subplots(figsize=(6, 4.8))
+    """Small 4×3-inch confusion matrix (fits one screen)."""
+    fig, ax = plt.subplots(figsize=(4, 3))
     im = ax.imshow(cm, cmap="viridis")
-    ax.set_xticks(np.arange(len(labels))), ax.set_yticks(np.arange(len(labels)))
+    ax.set_xticks(np.arange(len(labels)))
+    ax.set_yticks(np.arange(len(labels)))
     ax.set_xticklabels(labels), ax.set_yticklabels(labels)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
             ax.text(j, i, cm[i, j], ha="center", va="center", color="white")
     ax.set_xlabel("Predicted"), ax.set_ylabel("Actual")
-    plt.tight_layout(pad=0.4)
-    st.pyplot(fig, use_container_width=True)
+    plt.tight_layout(pad=0.3)
+    st.pyplot(fig)                       # ← no container-wide stretch
 
 
 def multi_roc(curves: dict[str, tuple[np.ndarray, np.ndarray]]) -> None:
-    fig, ax = plt.subplots(figsize=(6, 4.8))
+    """Compact 5×3-inch multi-ROC plot."""
+    fig, ax = plt.subplots(figsize=(5, 3))
     for name, (fpr, tpr) in curves.items():
         ax.plot(fpr, tpr, label=f"{name} (AUC {auc(fpr, tpr):.2f})")
     ax.plot([0, 1], [0, 1], "--", lw=1, color="#777")
     ax.set_xlabel("False Positive Rate"), ax.set_ylabel("True Positive Rate")
-    ax.legend(frameon=False)
-    plt.tight_layout(pad=0.4)
-    st.pyplot(fig, use_container_width=True)
+    ax.legend(frameon=False, fontsize="small")
+    plt.tight_layout(pad=0.3)
+    st.pyplot(fig)                       # ← no container-wide stretch
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
