@@ -183,6 +183,17 @@ with tabs[0]:
 # ============================================================================
 with tabs[1]:
     st.header("Purchase-Intent Models")
+  # Confusion matrix dropdown
+algo_cm = st.selectbox("Confusion Matrix for:", list(models.keys()))
+if algo_cm:
+    mdl = models[algo_cm]
+    preds_cm = ...
+    pretty_cm(...)
+    st.caption(...)
+
+st.subheader("ROC Curve")
+multi_roc(roc_dict)
+
 
     y = df["willing_to_purchase_12m"]
     X = dummies(df.drop(columns=["willing_to_purchase_12m"]))
