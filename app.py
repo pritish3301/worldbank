@@ -262,11 +262,17 @@ with tabs[3]:
     min_conf = st.number_input("Min confidence", 0.1, 1.0, 0.3, 0.05)
     if st.button("Run Apriori"):
         basket = df[sel_cols].astype(bool)
-        freq = apriori(basket, min_support=min_sup, use_colnames=True)
-        rules = association_rules(freq, metric="confidence", min_threshold=min_conf)
-        st.subheader("Top 10 rules")
-        st.dataframe(rules.sort_values("lift", ascending=False).head(10))
-        st.caption("Rules sorted by lift for strongest associations.")
+    freq = apriori(basket, min_support=min_sup, use_colnames=True)
+rules = association_rules(freq, metric="confidence", min_threshold=min_conf)
+
+# ── make antecedents / consequents human-readable ─────────────────────
+rules["antecedents"]  = rules["antecedents"].apply(lambda x: ", ".join(x))
+rules["consequents"] = rules["consequents"].apply(lambda x: ", ".join(x))
+
+show_cols = ["antecedents", "consequents", "support", "confidence", "lift"]
+st.subheader("Top 10 Association Rules")
+st.dataframe(rules[show_cols].sort_values("lift", ascending=False).head(10))
+st.caption("Rules sorted by lift for strongest associations.")
 
 # ---------------------------------------------------------------------------
 # 5. Regression
