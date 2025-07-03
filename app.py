@@ -32,8 +32,16 @@ df = load_data(uploaded_file)
 st.sidebar.success(f"Dataset rows: {df.shape[0]}, columns: {df.shape[1]}")
 
 # ---------------- Helper functions -----------------------------------------
+def get_numeric_df(data):
+    """Return numeric-only columns."""
+    return data.select_dtypes(include=np.number)
+
+def encode_categoricals(data):
+    """One-hot encode categoricals, drop first level to avoid collinearity."""
+    return pd.get_dummies(data, drop_first=True)
+
 def plot_conf_mat(cm, classes):
-    fig, ax = plt.subplots(figsize=(6, 5))   # match heat-map size
+    fig, ax = plt.subplots(figsize=(6, 5))          # matches heat-map size
     im = ax.imshow(cm, interpolation="nearest", cmap="viridis")
     ax.set_xticks(np.arange(len(classes))); ax.set_yticks(np.arange(len(classes)))
     ax.set_xticklabels(classes); ax.set_yticklabels(classes)
@@ -45,7 +53,7 @@ def plot_conf_mat(cm, classes):
     st.pyplot(fig)
 
 def roc_curve_multi(fpr_tpr_dict):
-    fig, ax = plt.subplots(figsize=(6, 5))   # same footprint
+    fig, ax = plt.subplots(figsize=(6, 5))          # same footprint
     for name, (fpr, tpr) in fpr_tpr_dict.items():
         ax.plot(fpr, tpr, label=f"{name} (AUC={auc(fpr,tpr):.2f})")
     ax.plot([0, 1], [0, 1], "--", lw=1)
