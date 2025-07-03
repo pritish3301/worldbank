@@ -241,26 +241,31 @@ with tabs[3]:
 # ---------------------------------------------------------------------------
 with tabs[4]:
     st.header("Spend Prediction – Regression Benchmarks")
+
     y_reg = df["max_willingness_to_pay_usd"]
     X_reg = encode_categoricals(df.drop(columns=["max_willingness_to_pay_usd", "cluster"]))
-    X_train_r, X_test_r, y_train_r, y_test_r = train_test_split(X_reg, y_reg,
-                                                                test_size=0.2, random_state=42)
+    X_train_r, X_test_r, y_train_r, y_test_r = train_test_split(
+        X_reg, y_reg, test_size=0.2, random_state=42
+    )
+
     regr_models = {
         "Linear": LinearRegression(),
         "Ridge": Ridge(alpha=1.0),
         "Lasso": Lasso(alpha=0.001),
         "DT Regressor": DecisionTreeRegressor(max_depth=6, random_state=42)
     }
+
     reg_results = {}
     for name, mdl in regr_models.items():
         mdl.fit(X_train_r, y_train_r)
         preds = mdl.predict(X_test_r)
-        reg_results[name] = {
-            "R2": r2_score(y_test_r, preds),
-            
-mse = mean_squared_error(y_test_r, preds)
-"RMSE": np.sqrt(mse)
 
+        # ---- compute metrics ----
+        mse = mean_squared_error(y_test_r, preds)   # √ keep this OUTSIDE the dict
+        reg_results[name] = {
+            "R2":   r2_score(y_test_r, preds),
+            "RMSE": np.sqrt(mse)                    # √ now refer to mse inside the dict
         }
+
     st.dataframe(pd.DataFrame(reg_results).T.style.format("{:.2f}"))
     st.caption("Quick comparison of baseline regressors for spend estimation.")
