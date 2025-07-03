@@ -70,80 +70,76 @@ tabs = st.tabs(["📊 Data Visualisation", "🤖 Classification",
 with tabs[0]:
     st.header("Descriptive Insights")
 
-  # ── FIRST ROW ─────────────────────────────────────────────────────────
-c1, c2 = st.columns(2)   # equal width columns
+ # ---------------------------------------------------------------------------
+# 1. Data Visualisation
+# ---------------------------------------------------------------------------
+with tabs[0]:
+    st.header("Descriptive Insights")
 
-# 1-A  Correlation heat-map
-with c1:
-    st.subheader("Correlation Heat-map")
-    num_df = df.select_dtypes(include=np.number)
-    fig, ax = plt.subplots(figsize=(6, 5))      # 6×5 inches
-    im = ax.imshow(num_df.corr(), cmap="viridis")
-    ax.set_xticks(range(len(num_df.columns)))
-    ax.set_xticklabels(num_df.columns, rotation=90, fontsize=6)
-    ax.set_yticks(range(len(num_df.columns)))
-    ax.set_yticklabels(num_df.columns, fontsize=6)
-    fig.colorbar(im, shrink=0.65)
-    st.pyplot(fig)
-    st.caption("Pair-wise Pearson correlations among numeric variables.")
+    # ── FIRST ROW ─────────────────────────────────────────────────────────
+    c1, c2 = st.columns(2)   # equal width columns
 
-# 1-B  Income distribution by country
-with c2:
-    st.subheader("Income Distribution by Country")
-    fig, ax = plt.subplots(figsize=(6, 5))      # SAME size as heat-map
-    for c in df["country"].unique():
-        ax.hist(
-            df[df["country"] == c]["household_income_usd"],
-            bins=30, alpha=0.5, label=c
+    # 1-A  Correlation heat-map
+    with c1:
+        st.subheader("Correlation Heat-map")
+        num_df = df.select_dtypes(include=np.number)
+        fig, ax = plt.subplots(figsize=(6, 5))
+        im = ax.imshow(num_df.corr(), cmap="viridis")
+        ax.set_xticks(range(len(num_df.columns)))
+        ax.set_xticklabels(num_df.columns, rotation=90, fontsize=6)
+        ax.set_yticks(range(len(num_df.columns)))
+        ax.set_yticklabels(num_df.columns, fontsize=6)
+        fig.colorbar(im, shrink=0.65)
+        st.pyplot(fig)
+        st.caption("Pair-wise Pearson correlations among numeric variables.")
+
+    # 1-B  Income distribution by country
+    with c2:
+        st.subheader("Income Distribution by Country")
+        fig, ax = plt.subplots(figsize=(6, 5))
+        for c in df["country"].unique():
+            ax.hist(
+                df[df["country"] == c]["household_income_usd"],
+                bins=30, alpha=0.5, label=c
+            )
+        ax.set_xlabel("Annual household income (USD)")
+        ax.set_xlim(left=105)
+        ax.legend()
+        st.pyplot(fig)
+        st.caption(
+            "Income is right-skewed and clearly separated by country tiers. "
+            "Histogram truncated below ≈ $100 to focus on the meaningful range."
         )
-    ax.set_xlabel("Annual household income (USD)")
-    ax.set_xlim(left=105)                      # ← start just above $100
-    ax.legend()
-    st.pyplot(fig)
-    st.caption(
-        "Income is right-skewed and clearly separated by country tiers. "
-        "Histogram truncated below ≈ $100 to focus on the meaningful range."
-    )
-# ──────────────────────────────────────────────────────────────────────
 
+    # ── SECOND ROW ────────────────────────────────────────────────────────
+    left2, right2 = st.columns([1, 3])  # KPI narrow, chart wide
 
-# ── SECOND ROW ────────────────────────────────────────────────────────
-left2, right2 = st.columns([1, 3])      # 1:3 ratio (KPI narrow, chart wide)
+    # KPIs on the left
+    with left2:
+        st.markdown("### Additional Quick Facts")
+        st.metric("Average Monthly Bill (USD)",
+                  f"{df['monthly_energy_bill_usd'].mean():.1f}")
+        st.metric("Median Max WTP (USD)",
+                  f"{df['max_willingness_to_pay_usd'].median():.0f}")
+        st.metric("Purchase Intent ≥ 'MAYBE'",
+                  f"{(df['willing_to_purchase_12m'] > 0).mean()*100:.1f}%")
 
-# (A) KPIs – now on the LEFT
-with left2:
-    st.markdown("### Additional Quick Facts")
-    st.metric(
-        label="Average Monthly Bill (USD)",
-        value=f"{df['monthly_energy_bill_usd'].mean():.1f}"
-    )
-    st.metric(
-        label="Median Max WTP (USD)",
-        value=f"{df['max_willingness_to_pay_usd'].median():.0f}"
-    )
-    st.metric(
-        label="Purchase Intent ≥ 'MAYBE'",
-        value=f"{(df['willing_to_purchase_12m'] > 0).mean() * 100:.1f}%"
-    )
-
-# (B) Box-plot – now on the RIGHT
-with right2:
-    st.markdown("#### Willingness by Environmental Concern")
-    fig, ax = plt.subplots(figsize=(6, 4))   # laptop-friendly size
-    box_data = [
-        df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
-        for k in sorted(df["env_concern_score"].unique())
-    ]
-    ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
-    ax.set_xlabel("Environmental concern score")
-    ax.set_ylabel("Max willingness to pay (USD)")
-    st.pyplot(fig)
-    st.caption(
-        "Households with stronger green concern are willing to pay more "
-        "for eco-friendly appliances."
-    )
-# ─────────────────────────────────────────────────────────────────────
-
+    # Box-plot on the right
+    with right2:
+        st.markdown("#### Willingness by Environmental Concern")
+        fig, ax = plt.subplots(figsize=(6, 4))
+        box_data = [
+            df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
+            for k in sorted(df["env_concern_score"].unique())
+        ]
+        ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
+        ax.set_xlabel("Environmental concern score")
+        ax.set_ylabel("Max willingness to pay (USD)")
+        st.pyplot(fig)
+        st.caption(
+            "Households with stronger green concern are willing to pay more "
+            "for eco-friendly appliances."
+        )
 
 
 
