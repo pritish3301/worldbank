@@ -97,20 +97,43 @@ with tabs[0]:
         st.caption("Income is right‑skewed with clear country‑wise tiers.")
 
     # More quick charts
-    st.markdown("### Additional Quick Facts")
-    st.metric("Average Monthly Bill (USD)", f"{df['monthly_energy_bill_usd'].mean():.1f}")
-    st.metric("Median Max WTP (USD)", f"{df['max_willingness_to_pay_usd'].median():.0f}")
-    st.metric("Purchase intent ≥ 'Maybe'",
-              f"{(df['willing_to_purchase_12m']>0).mean()*100:.1f}%")
+   # ── NEW side-by-side layout ──────────────────────────────────────────────
+left2, right2 = st.columns([3, 1])      # 3:1 width ratio (adjust if needed)
 
+# ➜ LEFT: Box-plot (larger figure, fits laptop width)
+with left2:
     st.markdown("#### Willingness by Environmental Concern")
-    fig, ax = plt.subplots()
-    box_data = [df[df["env_concern_score"]==k]["max_willingness_to_pay_usd"]
-                for k in sorted(df["env_concern_score"].unique())]
+    fig, ax = plt.subplots(figsize=(6, 4))   # 6×4 inches ~ laptop-friendly
+    box_data = [
+        df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
+        for k in sorted(df["env_concern_score"].unique())
+    ]
     ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
-    ax.set_xlabel("Environmental concern score"); ax.set_ylabel("Max WTP (USD)")
+    ax.set_xlabel("Environmental concern score")
+    ax.set_ylabel("Max WTP (USD)")
     st.pyplot(fig)
-    st.caption("Higher green concern correlates with larger spending willingness.")
+    st.caption(
+        "Higher environmental concern correlates with greater willingness "
+        "to pay for eco-friendly appliances."
+    )
+
+# ➜ RIGHT: KPI stack (one-below-one)
+with right2:
+    st.markdown("### Additional Quick Facts")
+    st.metric(
+        label="Average Monthly Bill (USD)",
+        value=f"{df['monthly_energy_bill_usd'].mean():.1f}"
+    )
+    st.metric(
+        label="Median Max WTP (USD)",
+        value=f"{df['max_willingness_to_pay_usd'].median():.0f}"
+    )
+    st.metric(
+        label="Purchase Intent ≥ 'Maybe'",
+        value=f"{(df['willing_to_purchase_12m'] > 0).mean() * 100:.1f}%"
+    )
+# ─────────────────────────────────────────────────────────────────────────
+
 
 # ---------------------------------------------------------------------------
 # 2. Classification
