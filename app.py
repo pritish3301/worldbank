@@ -69,37 +69,74 @@ tabs = st.tabs(["📊 Data Visualisation", "🤖 Classification",
 # ---------------------------------------------------------------------------
 with tabs[0]:
     st.header("Descriptive Insights")
-    ...
-    # FIRST ROW of charts (heatmap + hist)
-    ...
 
-    # ── SECOND ROW we added earlier ──────────────────────────────────────
-    left2, right2 = st.columns([3, 1])     # 3:1 width ratio
+    # ── FIRST ROW ─────────────────────────────────────────────────────────
+    c1, c2 = st.columns(2)
+
+    # 1-A Correlation heat-map
+    with c1:
+        st.subheader("Correlation Heat-map")
+        num_df = df.select_dtypes(include=np.number)
+        fig, ax = plt.subplots(figsize=(6, 5))
+        im = ax.imshow(num_df.corr(), cmap="viridis")
+        ax.set_xticks(range(len(num_df.columns)))
+        ax.set_xticklabels(num_df.columns, rotation=90, fontsize=6)
+        ax.set_yticks(range(len(num_df.columns)))
+        ax.set_yticklabels(num_df.columns, fontsize=6)
+        fig.colorbar(im, shrink=0.65)
+        st.pyplot(fig)
+        st.caption("Pair-wise Pearson correlations among numeric variables.")
+
+    # 1-B Income distribution by country
+    with c2:
+        st.subheader("Income Distribution by Country")
+        fig, ax = plt.subplots(figsize=(6, 5))
+        for c in df["country"].unique():
+            ax.hist(
+                df[df["country"] == c]["household_income_usd"],
+                bins=30, alpha=0.5, label=c
+            )
+        ax.set_xlabel("Annual household income (USD)")
+        ax.legend()
+        st.pyplot(fig)
+        st.caption("Income is right-skewed and clearly separated by country tiers.")
+
+    # ── SECOND ROW ────────────────────────────────────────────────────────
+    left2, right2 = st.columns([3, 1])      # 3:1 width ratio
+
+    # 2-A Willingness vs Environmental Concern (left)
     with left2:
         st.markdown("#### Willingness by Environmental Concern")
-        fig, ax = plt.subplots(figsize=(6, 4))
+        fig, ax = plt.subplots(figsize=(6, 4))   # laptop-friendly size
         box_data = [
             df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
             for k in sorted(df["env_concern_score"].unique())
         ]
         ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
         ax.set_xlabel("Environmental concern score")
-        ax.set_ylabel("Max WTP (USD)")
+        ax.set_ylabel("Max willingness to pay (USD)")
         st.pyplot(fig)
         st.caption(
-            "Higher environmental concern correlates with greater willingness "
-            "to pay for eco-friendly appliances."
+            "Households with stronger green concern are willing to pay more "
+            "for eco-friendly appliances."
         )
 
+    # 2-B Additional Quick Facts (right)
     with right2:
         st.markdown("### Additional Quick Facts")
-        st.metric("Average Monthly Bill (USD)",
-                  f"{df['monthly_energy_bill_usd'].mean():.1f}")
-        st.metric("Median Max WTP (USD)",
-                  f"{df['max_willingness_to_pay_usd'].median():.0f}")
-        st.metric("Purchase Intent ≥ 'Maybe'",
-                  f"{(df['willing_to_purchase_12m']>0).mean()*100:.1f}%")
-    # ─────────────────────────────────────────────────────────────────────
+        st.metric(
+            label="Average Monthly Bill (USD)",
+            value=f"{df['monthly_energy_bill_usd'].mean():.1f}"
+        )
+        st.metric(
+            label="Median Max WTP (USD)",
+            value=f"{df['max_willingness_to_pay_usd'].median():.0f}"
+        )
+        st.metric(
+            label="Purchase Intent ≥ 'MAYBE'",
+            value=f"{(df['willing_to_purchase_12m'] > 0).mean() * 100:.1f}%"
+        )
+
 
 
 
