@@ -70,36 +70,42 @@ tabs = st.tabs(["📊 Data Visualisation", "🤖 Classification",
 with tabs[0]:
     st.header("Descriptive Insights")
 
-    # ── FIRST ROW ─────────────────────────────────────────────────────────
-    c1, c2 = st.columns(2)
+  # ── FIRST ROW ─────────────────────────────────────────────────────────
+c1, c2 = st.columns(2)   # equal width columns
 
-    # 1-A Correlation heat-map
-    with c1:
-        st.subheader("Correlation Heat-map")
-        num_df = df.select_dtypes(include=np.number)
-        fig, ax = plt.subplots(figsize=(6, 5))
-        im = ax.imshow(num_df.corr(), cmap="viridis")
-        ax.set_xticks(range(len(num_df.columns)))
-        ax.set_xticklabels(num_df.columns, rotation=90, fontsize=6)
-        ax.set_yticks(range(len(num_df.columns)))
-        ax.set_yticklabels(num_df.columns, fontsize=6)
-        fig.colorbar(im, shrink=0.65)
-        st.pyplot(fig)
-        st.caption("Pair-wise Pearson correlations among numeric variables.")
+# 1-A  Correlation heat-map
+with c1:
+    st.subheader("Correlation Heat-map")
+    num_df = df.select_dtypes(include=np.number)
+    fig, ax = plt.subplots(figsize=(6, 5))      # 6×5 inches
+    im = ax.imshow(num_df.corr(), cmap="viridis")
+    ax.set_xticks(range(len(num_df.columns)))
+    ax.set_xticklabels(num_df.columns, rotation=90, fontsize=6)
+    ax.set_yticks(range(len(num_df.columns)))
+    ax.set_yticklabels(num_df.columns, fontsize=6)
+    fig.colorbar(im, shrink=0.65)
+    st.pyplot(fig)
+    st.caption("Pair-wise Pearson correlations among numeric variables.")
 
-    # 1-B Income distribution by country
-    with c2:
-        st.subheader("Income Distribution by Country")
-        fig, ax = plt.subplots(figsize=(6, 5))
-        for c in df["country"].unique():
-            ax.hist(
-                df[df["country"] == c]["household_income_usd"],
-                bins=30, alpha=0.5, label=c
-            )
-        ax.set_xlabel("Annual household income (USD)")
-        ax.legend()
-        st.pyplot(fig)
-        st.caption("Income is right-skewed and clearly separated by country tiers.")
+# 1-B  Income distribution by country
+with c2:
+    st.subheader("Income Distribution by Country")
+    fig, ax = plt.subplots(figsize=(6, 5))      # SAME size as heat-map
+    for c in df["country"].unique():
+        ax.hist(
+            df[df["country"] == c]["household_income_usd"],
+            bins=30, alpha=0.5, label=c
+        )
+    ax.set_xlabel("Annual household income (USD)")
+    ax.set_xlim(left=105)                      # ← start just above $100
+    ax.legend()
+    st.pyplot(fig)
+    st.caption(
+        "Income is right-skewed and clearly separated by country tiers. "
+        "Histogram truncated below ≈ $100 to focus on the meaningful range."
+    )
+# ──────────────────────────────────────────────────────────────────────
+
 
     # ── SECOND ROW ────────────────────────────────────────────────────────
     left2, right2 = st.columns([3, 1])      # 3:1 width ratio
