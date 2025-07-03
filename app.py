@@ -69,70 +69,38 @@ tabs = st.tabs(["📊 Data Visualisation", "🤖 Classification",
 # ---------------------------------------------------------------------------
 with tabs[0]:
     st.header("Descriptive Insights")
-    num_df = get_numeric_df(df)
-    cat_df = df.select_dtypes(exclude=np.number)
+    ...
+    # FIRST ROW of charts (heatmap + hist)
+    ...
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Correlation Heatmap")
-        fig, ax = plt.subplots()
-        cax = ax.imshow(num_df.corr(), cmap="viridis")
-        ax.set_xticks(range(len(num_df.columns)))
-        ax.set_xticklabels(num_df.columns, rotation=90, fontsize=6)
-        ax.set_yticks(range(len(num_df.columns)))
-        ax.set_yticklabels(num_df.columns, fontsize=6)
-        fig.colorbar(cax)
+    # ── SECOND ROW we added earlier ──────────────────────────────────────
+    left2, right2 = st.columns([3, 1])     # 3:1 width ratio
+    with left2:
+        st.markdown("#### Willingness by Environmental Concern")
+        fig, ax = plt.subplots(figsize=(6, 4))
+        box_data = [
+            df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
+            for k in sorted(df["env_concern_score"].unique())
+        ]
+        ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
+        ax.set_xlabel("Environmental concern score")
+        ax.set_ylabel("Max WTP (USD)")
         st.pyplot(fig)
-        st.caption("Shows pair‑wise linear correlations among numeric variables.")
+        st.caption(
+            "Higher environmental concern correlates with greater willingness "
+            "to pay for eco-friendly appliances."
+        )
 
-    with col2:
-        st.subheader("Income Distribution by Country")
-        fig, ax = plt.subplots()
-        for c in df["country"].unique():
-            ax.hist(df[df["country"] == c]["household_income_usd"],
-                    bins=30, alpha=0.5, label=c)
-        ax.set_xlabel("Household income (USD)")
-        ax.legend()
-        st.pyplot(fig)
-        st.caption("Income is right‑skewed with clear country‑wise tiers.")
+    with right2:
+        st.markdown("### Additional Quick Facts")
+        st.metric("Average Monthly Bill (USD)",
+                  f"{df['monthly_energy_bill_usd'].mean():.1f}")
+        st.metric("Median Max WTP (USD)",
+                  f"{df['max_willingness_to_pay_usd'].median():.0f}")
+        st.metric("Purchase Intent ≥ 'Maybe'",
+                  f"{(df['willing_to_purchase_12m']>0).mean()*100:.1f}%")
+    # ─────────────────────────────────────────────────────────────────────
 
-    # More quick charts
-   # ── NEW side-by-side layout ──────────────────────────────────────────────
-left2, right2 = st.columns([3, 1])      # 3:1 width ratio (adjust if needed)
-
-# ➜ LEFT: Box-plot (larger figure, fits laptop width)
-with left2:
-    st.markdown("#### Willingness by Environmental Concern")
-    fig, ax = plt.subplots(figsize=(6, 4))   # 6×4 inches ~ laptop-friendly
-    box_data = [
-        df[df["env_concern_score"] == k]["max_willingness_to_pay_usd"]
-        for k in sorted(df["env_concern_score"].unique())
-    ]
-    ax.boxplot(box_data, labels=sorted(df["env_concern_score"].unique()))
-    ax.set_xlabel("Environmental concern score")
-    ax.set_ylabel("Max WTP (USD)")
-    st.pyplot(fig)
-    st.caption(
-        "Higher environmental concern correlates with greater willingness "
-        "to pay for eco-friendly appliances."
-    )
-
-# ➜ RIGHT: KPI stack (one-below-one)
-with right2:
-    st.markdown("### Additional Quick Facts")
-    st.metric(
-        label="Average Monthly Bill (USD)",
-        value=f"{df['monthly_energy_bill_usd'].mean():.1f}"
-    )
-    st.metric(
-        label="Median Max WTP (USD)",
-        value=f"{df['max_willingness_to_pay_usd'].median():.0f}"
-    )
-    st.metric(
-        label="Purchase Intent ≥ 'Maybe'",
-        value=f"{(df['willing_to_purchase_12m'] > 0).mean() * 100:.1f}%"
-    )
-# ─────────────────────────────────────────────────────────────────────────
 
 
 # ---------------------------------------------------------------------------
