@@ -254,29 +254,39 @@ with tabs[2]:
 # ---------------------------------------------------------------------------
 with tabs[3]:
     st.header("Association Rule Mining – Apriori")
-    st.info("Select categorical one‑hot columns to include in APRIORI algorithm.")
-    onehot_cols = [c for c in df.columns if
-                   any(prefix in c for prefix in ("own_", "reason_", "barrier_", "pref_", "src_"))]
-    sel_cols = st.multiselect("Columns (at least 2)", onehot_cols, default=onehot_cols[:20])
-    min_sup = st.number_input("Min support", 0.01, 1.0, 0.05, 0.01)
-    min_conf = st.number_input("Min confidence", 0.1, 1.0, 0.3, 0.05)
+    st.info("Select categorical one-hot columns to include in APRIORI algorithm.")
+
+    onehot_cols = [
+        c for c in df.columns
+        if any(prefix in c for prefix in ("own_", "reason_", "barrier_", "pref_", "src_"))
+    ]
+
+    sel_cols = st.multiselect(
+        "Columns (at least 2)", onehot_cols, default=onehot_cols[:20]
+    )
+
+    min_sup  = st.number_input("Min support",     0.01, 1.0, 0.05, 0.01)
+    min_conf = st.number_input("Min confidence",  0.10, 1.0, 0.30, 0.05)
+
     if st.button("Run Apriori"):
         basket = df[sel_cols].astype(bool)
- freq = apriori(basket, min_support=min_sup, use_colnames=True)
-rules = association_rules(freq, metric="confidence", min_threshold=min_conf)
 
-# Convert frozensets → readable strings
-rules["antecedents"] = rules["antecedents"].apply(lambda x: ", ".join(x))
-rules["consequents"] = rules["consequents"].apply(lambda x: ", ".join(x))
+        freq  = apriori(basket, min_support=min_sup, use_colnames=True)
+        rules = association_rules(freq, metric="confidence", min_threshold=min_conf)
 
-show_cols = ["antecedents", "consequents", "support", "confidence", "lift"]
-st.subheader("Top 10 Association Rules")
-st.dataframe(
-    rules[show_cols]
-        .sort_values("lift", ascending=False)
-        .head(10)
-        .style.format({"support":"{:.3f}", "confidence":"{:.3f}", "lift":"{:.2f}"})
-)
+        # ── make antecedents / consequents human-readable ─────────────────
+        rules["antecedents"] = rules["antecedents"].apply(lambda x: ", ".join(x))
+        rules["consequents"] = rules["consequents"].apply(lambda x: ", ".join(x))
+
+        show_cols = ["antecedents", "consequents", "support", "confidence", "lift"]
+
+        st.subheader("Top 10 Association Rules")
+        st.dataframe(
+            rules[show_cols]
+                 .sort_values("lift", ascending=False)
+                 .head(10)
+                 .style.format({"support": "{:.3f}", "confidence": "{:.3f}", "lift": "{:.2f}"})
+        )
 
 
 # ---------------------------------------------------------------------------
